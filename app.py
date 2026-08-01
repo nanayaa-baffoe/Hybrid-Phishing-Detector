@@ -55,8 +55,15 @@ def extract_features(text):
 
 @st.cache_resource
 def get_groq_client():
+    # Try local .env first, then fall back to Streamlit Cloud secrets
     api_key = os.getenv("GROQ_API_KEY")
-    if not api_key: return None
+    if not api_key:
+        try:
+            api_key = st.secrets["GROQ_API_KEY"]
+        except Exception:
+            api_key = None
+    if not api_key:
+        return None
     return Groq(api_key=api_key)
 
 client = get_groq_client()
